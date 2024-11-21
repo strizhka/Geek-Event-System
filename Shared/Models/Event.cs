@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Fullstack_back.Models
+namespace Shared.Models
 {
     public class Event
     {
@@ -17,15 +17,17 @@ namespace Fullstack_back.Models
         public string? Description { get; set; }
 
         [Required]
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
 
         [Required]
-        public string? Adress { get; set; }
+        public string? Address { get; set; }
 
-        public virtual ICollection<Notification>? Notification { get; set; }
+        public ICollection<Notification>? Notifications { get; set; }
+
+        public virtual ICollection<Participation>? Participations { get; set; }
 
         [ForeignKey("Community")]
-        public int? CommunityID { get; set; }
-        public virtual Community? Community { get; set; }
+        public int? CommunityId { get; set; }
     }
 }
+

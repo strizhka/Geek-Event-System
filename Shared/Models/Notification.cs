@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Fullstack_back.Models
+namespace Shared.Models
 {
     public class Notification
     {

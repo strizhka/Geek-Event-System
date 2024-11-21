@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace Fullstack_back.Models
+namespace Shared.Models
 {
     public class Community
     {
@@ -19,7 +19,7 @@ namespace Fullstack_back.Models
         public DateTime? CreatedDate { get; set; }
 
         public virtual ICollection<Membership>? Memberships { get; set; }
-        public virtual ICollection<Event>? Events { get; set; }
 
+        public ICollection<Event>? Events { get; set; }
     }
 }
