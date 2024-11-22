@@ -3,15 +3,24 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "..\Shared\Shared.csproj", "{B23EC6DF-EEF8-4BCD-A6FB-AA773EADD740}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "..\Shared\Shared.csproj", "{B23EC6DF-EEF8-4BCD-A6FB-AA773EADD740}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "..\AuthService\AuthService.csproj", "{771133E2-7F8D-405B-9F45-2E89C22DB8B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthService", "..\AuthService\AuthService.csproj", "{771133E2-7F8D-405B-9F45-2E89C22DB8B9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B23EC6DF-EEF8-4BCD-A6FB-AA773EADD740} = {B23EC6DF-EEF8-4BCD-A6FB-AA773EADD740}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityService", "..\CommunityService\CommunityService.csproj", "{143CD0A0-5DD7-4938-976A-D6FF36ED5E01}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityService", "..\CommunityService\CommunityService.csproj", "{143CD0A0-5DD7-4938-976A-D6FF36ED5E01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventService", "..\EventService\EventService.csproj", "{1475B464-FA32-4372-8E9D-B92106FA917E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventService", "..\EventService\EventService.csproj", "{1475B464-FA32-4372-8E9D-B92106FA917E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B23EC6DF-EEF8-4BCD-A6FB-AA773EADD740} = {B23EC6DF-EEF8-4BCD-A6FB-AA773EADD740}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "..\NotificationService\NotificationService.csproj", "{18CDF00C-1662-4189-A775-A469D2A81F4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NotificationService", "..\NotificationService\NotificationService.csproj", "{18CDF00C-1662-4189-A775-A469D2A81F4F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B23EC6DF-EEF8-4BCD-A6FB-AA773EADD740} = {B23EC6DF-EEF8-4BCD-A6FB-AA773EADD740}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

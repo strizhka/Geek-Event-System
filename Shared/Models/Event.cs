@@ -17,17 +17,12 @@ namespace Shared.Models
         public string? Description { get; set; }
 
         [Required]
-        public DateTime? Date { get; set; }
+        public DateTime Date { get; set; }
 
         [Required]
         public string? Address { get; set; }
 
-        public ICollection<Notification>? Notifications { get; set; }
-
-        public virtual ICollection<Participation>? Participations { get; set; }
-
-        [ForeignKey("Community")]
-        public int? CommunityId { get; set; }
+        public int CommunityId { get; set; }
     }
 }
 

@@ -17,9 +17,5 @@ namespace Shared.Models
         public string? Description { get; set; }
 
         public DateTime? CreatedDate { get; set; }
-
-        public virtual ICollection<Membership>? Memberships { get; set; }
-
-        public ICollection<Event>? Events { get; set; }
     }
 }

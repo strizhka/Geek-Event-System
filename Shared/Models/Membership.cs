@@ -11,12 +11,9 @@ namespace Shared.Models
 
         public bool IsConfirmed { get; set; }
 
-        [ForeignKey("User")]
-        public int? UserID { get; set; }
+        public int UserId { get; set; }
 
-        [ForeignKey("Community")]
-        public int? CommunityID { get; set; }
-        public virtual Community? Community { get; set; }
+        public int CommunityId { get; set; }
     }
 }
 
