@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Shared.Models;
 
-namespace UserService.Data
+namespace AuthService
 {
     public class AuthDbContext : DbContext
     {
