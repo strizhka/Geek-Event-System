@@ -5,14 +5,12 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 builder.Services.AddScoped<IAuthManager, AuthManager>();
 
@@ -23,9 +21,8 @@ builder.Services.AddScoped(typeof(IPasswordHasher<>), typeof(PasswordHasher<>));
 builder.Services.Configure<TokenSettings>(
     builder.Configuration.GetSection("TokenSettings"));
 
+// Регистрация TokenManager
 builder.Services.AddScoped<ITokenManager, TokenManager>();
-
-
 
 var app = builder.Build();
 
@@ -36,14 +33,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Важное замечание: Middleware для проверки токена должен быть до UseAuthorization()
 app.UseMiddleware<TokenValidationMiddleware>();
 
+// Убираем второй вызов UseAuthorization()
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+

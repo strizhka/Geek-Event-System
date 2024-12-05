@@ -4,7 +4,9 @@ namespace AuthService
 {
     public interface IAuthManager
     {
-        Task RegisterUserAsync(UserRegisterDto userDto);
-        Task<string> LoginUserAsync(UserLoginDto userDto);
+        Task<string> RegisterUserAsync(RegisterRequest userDto);
+        Task<string> LoginUserAsync(LoginRequest userDto);
+
+        Task LogoutUserAsync(int userId);
     }
 }

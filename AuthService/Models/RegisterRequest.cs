@@ -1,6 +1,6 @@
 ﻿namespace AuthService
 {
-    public class UserRegisterDto
+    public class RegisterRequest
     {
         public string? Username { get; set; }
         public required string Password { get; set; }

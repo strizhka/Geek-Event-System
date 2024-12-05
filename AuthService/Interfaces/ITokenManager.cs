@@ -5,7 +5,9 @@ namespace AuthService
     public interface ITokenManager
     {
         string GenerateAccessToken(int userId);
-        ClaimsPrincipal GetPrincipalFromToken(string token);
+        string GenerateRefreshToken(int userId);
+        (string AccessToken, string RefreshToken) GenerateTokens(int userId);
+        Task<ClaimsPrincipal?> GetPrincipalFromToken(string token);
+        int TokenLifetimeMinutes { get; }
     }
-
 }

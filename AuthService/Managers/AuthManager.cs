@@ -1,9 +1,8 @@
-﻿
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using AuthService.Models;
+using System.IdentityModel.Tokens.Jwt;
+using Newtonsoft.Json;
 
 namespace AuthService
 {
@@ -20,7 +19,7 @@ namespace AuthService
             _tokenManager = tokenManager;
         }
 
-        public async Task RegisterUserAsync(UserRegisterDto userDto)
+        public async Task<string> RegisterUserAsync(RegisterRequest userDto)
         {
             if (await _context.Users.AnyAsync(u => u.Email == userDto.Email))
             {
@@ -38,9 +37,12 @@ namespace AuthService
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            var tokens = _tokenManager.GenerateTokens(user.UserId);
+            return JsonConvert.SerializeObject(tokens);
         }
 
-        public async Task<string> LoginUserAsync(UserLoginDto userDto)
+        public async Task<string> LoginUserAsync(Models.LoginRequest userDto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDto.Email);
             if (user == null)
@@ -57,7 +59,21 @@ namespace AuthService
             var token = _tokenManager.GenerateAccessToken(user.UserId);
             return token;
         }
+
+        public async Task LogoutUserAsync(int userId)
+        {
+            // Удаляем Refresh Token из базы данных
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            if (user != null)
+            {
+                user.RefreshToken = null; // Удаляем Refresh Token
+                await _context.SaveChangesAsync();
+            }
+
+            //// Опционально отправляем уведомление через RabbitMQ
+            //var producer = new RabbitMqProducer();
+            //await producer.SendLogoutNotificationAsync(token);
+        }
+
     }
-
-
 }

@@ -24,6 +24,8 @@ namespace Shared.Models
         public string? HashedPassword { get; set; }
 
         public string? UserRole { get; set; }
+
+        public string? RefreshToken { get; set; }
     }
 }
 
