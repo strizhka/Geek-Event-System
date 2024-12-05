@@ -1,11 +1,23 @@
 using AuthService;
+using AuthService.Interfaces;
+using AuthService.Managers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+});
+
 
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -21,8 +33,36 @@ builder.Services.AddScoped(typeof(IPasswordHasher<>), typeof(PasswordHasher<>));
 builder.Services.Configure<TokenSettings>(
     builder.Configuration.GetSection("TokenSettings"));
 
-// Регистрация TokenManager
 builder.Services.AddScoped<ITokenManager, TokenManager>();
+
+builder.Services.AddScoped<IEmailManager, EmailManager>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("https://localhost:7285")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenSettings:SecretKey"])),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true
+    };
+});
 
 var app = builder.Build();
 
@@ -33,11 +73,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Важное замечание: Middleware для проверки токена должен быть до UseAuthorization()
-app.UseMiddleware<TokenValidationMiddleware>();
-
-// Убираем второй вызов UseAuthorization()
+app.UseCors();
+app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseHttpsRedirection();
 

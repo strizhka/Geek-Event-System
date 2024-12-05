@@ -1,4 +1,5 @@
 ﻿using AuthService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -79,5 +80,72 @@ namespace AuthService.Controllers
 
             return Ok(newTokens);
         }
+
+        [HttpGet("user/{id}")]
+        //[Authorize]
+        public async Task<IActionResult> GetUser(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(new { user.Email, user.UserName, user.UserRole });
+        }
+
+        [HttpPost("change-password")]
+        //[Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            var user = await _context.Users.FindAsync(request.UserId);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            var isValid = _authManager.ValidatePassword(user, request.CurrentPassword);
+
+            if (!isValid)
+            {
+                return BadRequest("Invalid current password.");
+            }
+
+            user.HashedPassword = _authManager.HashPassword(user, request.NewPassword);
+            await _context.SaveChangesAsync();
+
+            return Ok("Password changed successfully.");
+        }
+
+        [HttpPost("recover-password")]
+        public async Task<IActionResult> RecoverPassword([FromBody] RecoverPasswordRequest request)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+
+                if (user == null)
+                {
+                    return BadRequest("User with this email does not exist.");
+                }
+
+                var temporaryPassword = _authManager.GenerateTemporaryPassword();
+
+                user.HashedPassword = _authManager.HashPassword(user, temporaryPassword);
+
+                await _context.SaveChangesAsync();
+
+                await _authManager.SendRecoveryEmailAsync(user.Email, temporaryPassword);
+
+                return Ok("Temporary password sent to your email.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
+        }
+
     }
 }

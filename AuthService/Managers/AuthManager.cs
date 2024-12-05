@@ -3,6 +3,7 @@ using Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json;
+using AuthService.Interfaces;
 
 namespace AuthService
 {
@@ -11,12 +12,14 @@ namespace AuthService
         private readonly AuthDbContext _context;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly ITokenManager _tokenManager;
+        private readonly IEmailManager _emailManager;
 
-        public AuthManager(IPasswordHasher<User> passwordHasher, AuthDbContext context, ITokenManager tokenManager)
+        public AuthManager(IPasswordHasher<User> passwordHasher, AuthDbContext context, ITokenManager tokenManager, IEmailManager emailManager)
         {
             _passwordHasher = passwordHasher;
             _context = context;
             _tokenManager = tokenManager;
+            _emailManager = emailManager;
         }
 
         public async Task<string> RegisterUserAsync(RegisterRequest userDto)
@@ -33,7 +36,7 @@ namespace AuthService
                 UserRole = "User"
             };
 
-            user.HashedPassword = _passwordHasher.HashPassword(user, userDto.Password);
+            user.HashedPassword = HashPassword(user, userDto.Password);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -75,5 +78,30 @@ namespace AuthService
             //await producer.SendLogoutNotificationAsync(token);
         }
 
+        public bool ValidatePassword(User user, string password)
+        {
+            var result = _passwordHasher.VerifyHashedPassword(user, user.HashedPassword, password);
+            return result == PasswordVerificationResult.Success;
+        }
+
+        public string HashPassword(User user, string password)
+        {
+            return _passwordHasher.HashPassword(user, password);
+        }
+
+        public string GenerateTemporaryPassword()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, 10)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public async Task SendRecoveryEmailAsync(string email, string temporaryPassword)
+        {
+            var subject = "Password Recovery";
+            var body = $"Your temporary password is: {temporaryPassword}";
+            await _emailManager.SendEmailAsync(email, subject, body);
+        }
     }
 }

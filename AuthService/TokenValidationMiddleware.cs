@@ -13,15 +13,12 @@
 
         public async Task Invoke(HttpContext context)
         {
-            // Получаем токен из заголовков запроса
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             if (token != null)
             {
-                // Создаем область для разрешения scoped сервисов
                 using (var scope = _serviceScopeFactory.CreateScope())
                 {
-                    // Получаем ITokenManager в пределах области
                     var tokenManager = scope.ServiceProvider.GetRequiredService<ITokenManager>();
 
                     var principal = await tokenManager.GetPrincipalFromToken(token);
