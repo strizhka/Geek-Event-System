@@ -105,9 +105,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 app.UseAuthentication();
+app.UseMiddleware<TokenValidationMiddleware>();
 app.UseAuthorization();
 
-//app.UseMiddleware<TokenValidationMiddleware>();
 
 app.UseHttpsRedirection();
 
