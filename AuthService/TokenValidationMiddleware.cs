@@ -15,6 +15,15 @@
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
+            if (string.IsNullOrEmpty(token))
+            {
+                Console.WriteLine("Authorization header is missing or empty.");
+            }
+            else
+            {
+                Console.WriteLine($"Received token: {token}");
+            }
+
             if (token != null)
             {
                 using (var scope = _serviceScopeFactory.CreateScope())
@@ -38,6 +47,5 @@
             await _next(context);
         }
     }
-
 }
 

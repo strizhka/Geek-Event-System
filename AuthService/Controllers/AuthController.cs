@@ -50,6 +50,7 @@ namespace AuthService.Controllers
         }
 
         [HttpPost("logout")]
+        [Authorize]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest logoutRequest)
         {
             try
@@ -82,7 +83,7 @@ namespace AuthService.Controllers
         }
 
         [HttpGet("user/{id}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -96,7 +97,7 @@ namespace AuthService.Controllers
         }
 
         [HttpPost("change-password")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
             var user = await _context.Users.FindAsync(request.UserId);

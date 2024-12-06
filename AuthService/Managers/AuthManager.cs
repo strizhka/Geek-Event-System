@@ -65,15 +65,13 @@ namespace AuthService
 
         public async Task LogoutUserAsync(int userId)
         {
-            // Удаляем Refresh Token из базы данных
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
             if (user != null)
             {
-                user.RefreshToken = null; // Удаляем Refresh Token
+                user.RefreshToken = null;
                 await _context.SaveChangesAsync();
             }
 
-            //// Опционально отправляем уведомление через RabbitMQ
             //var producer = new RabbitMqProducer();
             //await producer.SendLogoutNotificationAsync(token);
         }

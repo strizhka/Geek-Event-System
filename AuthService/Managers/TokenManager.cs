@@ -57,11 +57,8 @@ namespace AuthService
 
         public string GenerateRefreshToken(int userId)
         {
-            // Refresh token генерируется с более длительным сроком действия
             var refreshToken = Guid.NewGuid().ToString();
 
-            // Сохраняем Refresh Token в базе данных или другом хранилище
-            // (например, в базе данных связанный с пользователем)
             SaveRefreshToken(userId, refreshToken);
 
             return refreshToken;
@@ -69,7 +66,6 @@ namespace AuthService
 
         private void SaveRefreshToken(int userId, string refreshToken)
         {
-            // Сохраните refresh token для пользователя в базе данных
             var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
             if (user != null)
             {
