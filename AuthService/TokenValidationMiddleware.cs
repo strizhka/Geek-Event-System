@@ -4,11 +4,13 @@
     {
         private readonly RequestDelegate _next;
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly RabbitMqConsumer _consumer;
 
-        public TokenValidationMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory)
+        public TokenValidationMiddleware(RequestDelegate next, IServiceScopeFactory serviceScopeFactory, RabbitMqConsumer consumer)
         {
             _next = next;
             _serviceScopeFactory = serviceScopeFactory;
+            _consumer = consumer;
         }
 
         public async Task Invoke(HttpContext context)
@@ -17,7 +19,9 @@
 
             if (string.IsNullOrEmpty(token))
             {
-                Console.WriteLine("Authorization header is missing or empty.");
+                context.Response.StatusCode = 401;
+                await context.Response.WriteAsync("Authorization header is missing or empty.");
+                return;
             }
             else
             {

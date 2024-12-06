@@ -7,6 +7,7 @@ public class RabbitMqConsumer
 {
     private readonly string _hostName = "localhost";
     private readonly string _exchangeName = "token_validation";
+    private readonly string _queueName = "tokens";
 
     public async Task StartListeningAsync()
     {
@@ -14,12 +15,11 @@ public class RabbitMqConsumer
         using var connection = await factory.CreateConnectionAsync();
         using var channel = await connection.CreateChannelAsync();
 
+        await channel.QueueDeclareAsync(queue: _queueName);
+
         await channel.ExchangeDeclareAsync(exchange: _exchangeName, type: ExchangeType.Fanout);
 
-        var queueDeclareResult = await channel.QueueDeclareAsync();
-        string queueName = queueDeclareResult.QueueName;
-
-        await channel.QueueBindAsync(queue: queueName, exchange: _exchangeName, routingKey: string.Empty);
+        await channel.QueueBindAsync(queue: _queueName, exchange: _exchangeName, routingKey: _queueName);
 
         Console.WriteLine(" [*] Waiting for validation results.");
 
@@ -33,15 +33,11 @@ public class RabbitMqConsumer
             await HandleMessageAsync(message);
         };
 
-        await channel.BasicConsumeAsync(queue: queueName, autoAck: true, consumer: consumer);
-
-        Console.WriteLine(" Press [enter] to exit.");
-        Console.ReadLine();
+        await channel.BasicConsumeAsync(queue: _queueName, autoAck: true, consumer: consumer);
     }
 
     private Task HandleMessageAsync(string message)
     {
-        // Пример обработки сообщения
         var parts = message.Split(", ");
         var token = parts[0].Split(":")[1];
         var isValid = parts[1].Split(":")[1] == "True";

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.IdentityModel.Tokens.Jwt;
 using Newtonsoft.Json;
 using AuthService.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace AuthService
 {
@@ -60,20 +61,22 @@ namespace AuthService
             }
 
             var token = _tokenManager.GenerateAccessToken(user.UserId);
+            await _tokenManager.GetPrincipalFromToken(token);
             return token;
         }
 
         public async Task LogoutUserAsync(int userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            var token = user?.RefreshToken ?? string.Empty;
             if (user != null)
             {
                 user.RefreshToken = null;
                 await _context.SaveChangesAsync();
             }
 
-            //var producer = new RabbitMqProducer();
-            //await producer.SendLogoutNotificationAsync(token);
+            var producer = new RabbitMqPublisher();
+            await producer.SendLogoutNotificationAsync(token, false);
         }
 
         public bool ValidatePassword(User user, string password)

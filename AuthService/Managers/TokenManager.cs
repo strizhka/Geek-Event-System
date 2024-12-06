@@ -92,14 +92,14 @@ namespace AuthService
             {
                 var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
 
-                var producer = new RabbitMqProducer();
+                var producer = new RabbitMqPublisher();
                 await producer.SendValidationResultAsync(token, isValid: true);
 
                 return principal;
             }
             catch
             {
-                var producer = new RabbitMqProducer();
+                var producer = new RabbitMqPublisher();
                 await producer.SendValidationResultAsync(token, isValid: false);
 
                 return null;
