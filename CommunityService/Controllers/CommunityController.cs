@@ -1,6 +1,7 @@
 ﻿using CommunityService.Data;
 using CommunityService.Interfaces;
 using CommunityService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace CommunityService.Controllers
         }
 
         [HttpPost("create-community")]
+        [Authorize]
         public async Task<IActionResult> CreateCommunity([FromBody] CreateCommunityRequest createCommunityRequest)
         {
             try
@@ -86,6 +88,7 @@ namespace CommunityService.Controllers
 
 
         [HttpPut("update-community/{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateCommunity(int id, [FromBody] UpdateCommunityRequest updateCommunityRequest)
         {
             try
@@ -100,6 +103,7 @@ namespace CommunityService.Controllers
         }
 
         [HttpDelete("delete-community/{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteCommunity(int id)
         {
             try

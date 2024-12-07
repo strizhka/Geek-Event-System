@@ -2,6 +2,7 @@ using CommunityService.Data;
 using CommunityService.Interfaces;
 using CommunityService.Managers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -9,16 +10,23 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+});
 
 builder.Services.AddDbContext<CommunityDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+builder.Services.AddControllers();
+
+builder.Services.AddSingleton<RabbitMqConsumer>();
+
 builder.Services.AddScoped<ICommunityManager, CommunityManager>();
 builder.Services.AddScoped<IMembershipManager, MembershipManager>();
-
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -59,8 +67,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+var tokenConsumer = app.Services.GetRequiredService<RabbitMqConsumer>();
+_ = Task.Run(() => tokenConsumer.StartListeningAsync());
+
 app.UseCors();
 app.UseAuthentication();
+app.UseMiddleware<AuthorizationMiddleware>();
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
