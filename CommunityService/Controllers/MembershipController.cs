@@ -2,6 +2,7 @@
 using CommunityService.Interfaces;
 using CommunityService.Managers;
 using CommunityService.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ namespace CommunityService.Controllers
         }
 
         [HttpPost("join-community/{id}")]
+        [Authorize]
         public async Task<IActionResult> JoinCommunity(int id, [FromBody] JoinCommunityRequest request)
         {
             try
@@ -33,7 +35,8 @@ namespace CommunityService.Controllers
             }
         }
 
-        [HttpPost("leave")] 
+        [HttpPost("leave-community")]
+        [Authorize]
         public async Task<IActionResult> LeaveCommunity([FromBody] JoinCommunityRequest request)
         {
             await _membershipManager.LeaveCommunityAsync(request.UserId, request.CommunityId);
@@ -41,6 +44,7 @@ namespace CommunityService.Controllers
         }
 
         [HttpGet("user-communities/{userId}")]
+        [Authorize]
         public async Task<IActionResult> GetUserCommunities(int userId)
         {
             try

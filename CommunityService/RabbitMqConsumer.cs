@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.Caching.Memory;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Collections.Concurrent;
 using System.Text;
@@ -9,9 +10,9 @@ public class RabbitMqConsumer
 {
     private readonly string _hostName = "localhost";
     private readonly string _exchangeName = "token_validation";
-    private readonly string _queueName = "Auth";
+    private readonly string _queueName = "community_queue";
 
-    private static readonly ConcurrentDictionary<string, bool> TokenCache = new();
+    private static readonly MemoryCache TokenCache = new(new MemoryCacheOptions());
 
     public async Task StartListeningAsync()
     {
@@ -55,7 +56,7 @@ public class RabbitMqConsumer
         var token = parts[0].Split(":")[1];
         var isValid = parts[1].Split(":")[1] == "True";
 
-        TokenCache[token] = isValid;
+        TokenCache.Set(token, isValid, TimeSpan.FromMinutes(15));
         Console.WriteLine($"Token '{token}' validation updated: {isValid}");
 
         return Task.CompletedTask;
@@ -63,7 +64,7 @@ public class RabbitMqConsumer
 
     public static bool IsTokenValid(string token)
     {
-        return TokenCache.TryGetValue(token, out var isValid) && isValid;
+        return TokenCache.TryGetValue(token, out bool isValid) && isValid;
     }
 }
 

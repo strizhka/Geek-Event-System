@@ -65,6 +65,7 @@ namespace AuthService.Controllers
         }
 
         [HttpPost("refresh-token")]
+        [Authorize]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
             var refreshToken = refreshTokenRequest.RefreshToken;
@@ -83,7 +84,6 @@ namespace AuthService.Controllers
         }
 
         [HttpGet("user/{id}")]
-        [Authorize]
         public async Task<IActionResult> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
@@ -148,5 +148,35 @@ namespace AuthService.Controllers
             }
         }
 
+        [HttpDelete("delete-account")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest request)
+        {
+            try
+            {
+                // Найти пользователя по ID
+                var user = await _context.Users.FindAsync(request.UserId);
+
+                if (user == null)
+                {
+                    return NotFound("User not found.");
+                }
+
+                var userIdClaim = User.FindFirst("UserId")?.Value;
+                if (userIdClaim == null || userIdClaim != user.UserId.ToString())
+                {
+                    return Forbid("You do not have permission to delete this account.");
+                }
+
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
+
+                return Ok("User account deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred while deleting the account: {ex.Message}");
+            }
+        }
     }
 }
