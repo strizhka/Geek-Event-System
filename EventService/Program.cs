@@ -25,6 +25,7 @@ builder.Services.AddDbContext<EventDbContext>(options =>
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<RabbitMqConsumer>();
+builder.Services.AddSingleton<RabbitMqPublisher>();
 
 builder.Services.AddScoped<IEventManager, EventManager>();
 builder.Services.AddScoped<IParticipationManager, ParticipationManager>();

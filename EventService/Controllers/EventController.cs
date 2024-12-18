@@ -1,7 +1,6 @@
 ﻿using CommunityService.Models;
 using EventService.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventService.Controllers
@@ -107,6 +106,7 @@ namespace EventService.Controllers
                 }
 
                 await _eventManager.UpdateEventAsync(updateEventRequest);
+
                 return Ok(new { Message = "Event updated successfully." });
             }
             catch (Exception ex)
@@ -122,6 +122,7 @@ namespace EventService.Controllers
             try
             {
                 await _eventManager.DeleteEventAsync(id);
+
                 return Ok(new { Message = "Event deleted successfully." });
             }
             catch (Exception ex)

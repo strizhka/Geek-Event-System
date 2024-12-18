@@ -154,7 +154,6 @@ namespace AuthService.Controllers
         {
             try
             {
-                // Найти пользователя по ID
                 var user = await _context.Users.FindAsync(request.UserId);
 
                 if (user == null)
